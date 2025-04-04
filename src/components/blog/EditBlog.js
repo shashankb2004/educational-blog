@@ -17,24 +17,37 @@ const EditBlog = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        if (!apiUrl) {
+          throw new Error('API URL is not configured');
+        }
+
+        const response = await axios.get(`${apiUrl}/api/blogs/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setBlog(response.data);
+        setFormData({
+          title: response.data.title,
+          content: response.data.content,
+          category: response.data.category
+        });
+      } catch (err) {
+        console.error('Error fetching blog:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
+        setError('Failed to fetch blog');
+      }
+    };
+
     fetchBlog();
   }, [id]);
-
-  const fetchBlog = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/blogs/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setBlog(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch blog');
-      setLoading(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,26 +59,31 @@ const EditBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
-    setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:5000/api/blogs/${id}`,
-        blog,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL is not configured');
+      }
+
+      await axios.put(`${apiUrl}/api/blogs/${id}`, formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      );
-      setSuccess('Blog updated successfully!');
-      setTimeout(() => {
-        navigate('/blogs');
-      }, 1500);
+      });
+      navigate(`/blogs/${id}`);
     } catch (err) {
+      console.error('Error updating blog:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       setError(err.response?.data?.message || 'Failed to update blog');
+    } finally {
+      setLoading(false);
     }
   };
 

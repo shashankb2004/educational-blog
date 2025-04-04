@@ -19,23 +19,51 @@ const Blogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/blogs');
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL is not configured');
+      }
+
+      console.log('Fetching blogs from:', apiUrl);
+      const response = await axios.get(`${apiUrl}/api/blogs`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       setBlogs(response.data);
       setLoading(false);
     } catch (err) {
+      console.error('Error fetching blogs:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       setError('Failed to fetch blogs');
       setLoading(false);
-      console.error('Error fetching blogs:', err);
     }
   };
 
   const handleReadMore = async (blogId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/blogs/${blogId}`);
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL is not configured');
+      }
+
+      const response = await axios.get(`${apiUrl}/api/blogs/${blogId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       setSelectedBlog(response.data);
       setEditMode(false);
     } catch (err) {
-      console.error('Error fetching blog details:', err);
+      console.error('Error fetching blog details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setError('Failed to fetch blog details');
     }
   };
 
@@ -61,19 +89,25 @@ const Blogs = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:5000/api/blogs/${editedBlog._id}`,
-        editedBlog,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL is not configured');
+      }
+
+      await axios.put(`${apiUrl}/api/blogs/${editedBlog._id}`, editedBlog, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      );
+      });
+      
+      const updatedBlog = await axios.get(`${apiUrl}/api/blogs/${editedBlog._id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       setEditMode(false);
       fetchBlogs();
-      const updatedBlog = await axios.get(`http://localhost:5000/api/blogs/${editedBlog._id}`);
       setSelectedBlog(updatedBlog.data);
     } catch (err) {
       console.error('Error updating blog:', err);

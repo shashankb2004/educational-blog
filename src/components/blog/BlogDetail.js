@@ -16,10 +16,15 @@ const BlogDetail = () => {
 
   const fetchBlog = async () => {
     try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL is not configured');
+      }
+
       console.log('Fetching blog with ID:', id);
-      console.log('API URL:', process.env.REACT_APP_API_URL);
+      console.log('API URL:', apiUrl);
       
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/blogs/${id}`, {
+      const response = await axios.get(`${apiUrl}/api/blogs/${id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -32,7 +37,11 @@ const BlogDetail = () => {
       console.error('Error fetching blog:', {
         message: err.message,
         response: err.response?.data,
-        status: err.response?.status
+        status: err.response?.status,
+        config: {
+          url: err.config?.url,
+          method: err.config?.method
+        }
       });
       
       if (err.response) {
@@ -40,7 +49,7 @@ const BlogDetail = () => {
       } else if (err.request) {
         setError('Unable to connect to server. Please check your internet connection.');
       } else {
-        setError('An unexpected error occurred. Please try again.');
+        setError(err.message || 'An unexpected error occurred. Please try again.');
       }
       setLoading(false);
     }
@@ -61,7 +70,16 @@ const BlogDetail = () => {
   if (error) {
     return (
       <div className="container mt-5">
-        <div className="alert alert-danger">{error}</div>
+        <div className="alert alert-danger">
+          <h4 className="alert-heading">Error</h4>
+          <p>{error}</p>
+          <hr />
+          <p className="mb-0">
+            <Link to="/blogs" className="btn btn-outline-primary">
+              Back to Blogs
+            </Link>
+          </p>
+        </div>
       </div>
     );
   }
@@ -69,7 +87,16 @@ const BlogDetail = () => {
   if (!blog) {
     return (
       <div className="container mt-5">
-        <div className="alert alert-info">Blog not found</div>
+        <div className="alert alert-info">
+          <h4 className="alert-heading">Blog Not Found</h4>
+          <p>The blog you're looking for doesn't exist or has been removed.</p>
+          <hr />
+          <p className="mb-0">
+            <Link to="/blogs" className="btn btn-outline-primary">
+              Back to Blogs
+            </Link>
+          </p>
+        </div>
       </div>
     );
   }

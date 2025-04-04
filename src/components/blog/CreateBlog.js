@@ -25,28 +25,30 @@ const CreateBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    setError('');
 
     try {
-      // Create excerpt from content (first 150 characters)
-      const excerpt = formData.content.substring(0, 150) + '...';
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL is not configured');
+      }
 
-      const response = await axios.post(
-        'http://localhost:5000/api/blogs',
-        {
-          ...formData,
-          excerpt
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${apiUrl}/api/blogs`, formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         }
-      );
+      });
 
       navigate('/blogs');
     } catch (err) {
+      console.error('Error creating blog:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       setError(err.response?.data?.message || 'Failed to create blog');
     } finally {
       setLoading(false);
