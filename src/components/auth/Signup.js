@@ -60,34 +60,13 @@ const Signup = () => {
     }
 
     setLoading(true);
-
     try {
-      console.log('Attempting registration with:', {
-        username: formData.username,
-        email: formData.email,
-        passwordLength: formData.password.length
-      });
-
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      });
-      
-      console.log('Registration successful:', response.data);
-      
-      // Log the user in after successful registration
+      const { confirmPassword, ...signupData } = formData;
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/signup`, signupData);
       login(response.data);
       navigate('/');
     } catch (err) {
-      console.error('Registration error:', err);
-      if (err.response) {
-        setError(err.response.data.message || 'Registration failed. Please try again.');
-      } else if (err.request) {
-        setError('Unable to connect to server. Please check your internet connection.');
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
+      setError(err.response?.data?.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }

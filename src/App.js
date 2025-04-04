@@ -19,7 +19,7 @@ import PrivateRoute from './components/auth/PrivateRoute';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/educational-blog">
         <div className="App">
           <Navbar />
           <div className="page-transition" style={{ paddingTop: '76px' }}>

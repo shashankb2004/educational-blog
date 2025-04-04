@@ -31,11 +31,32 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
+      console.log('Attempting login with:', {
+        username: formData.username,
+        apiUrl: process.env.REACT_APP_API_URL
+      });
+      
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, formData, {
+        timeout: 5000, // 5 second timeout
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Login response:', response.data);
       login(response.data);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login');
+      console.error('Login error:', err);
+      if (err.code === 'ECONNABORTED') {
+        setError('Connection timed out. Please try again.');
+      } else if (err.response) {
+        setError(err.response.data.message || 'Invalid credentials');
+      } else if (err.request) {
+        setError('Unable to connect to server. Please check your internet connection.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

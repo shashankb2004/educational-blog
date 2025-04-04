@@ -65,17 +65,28 @@ router.post('/signup', async (req, res) => {
 // Login route
 router.post('/login', async (req, res) => {
   try {
+    console.log('Login attempt with:', {
+      username: req.body.username,
+      body: req.body
+    });
+
     const { username, password } = req.body;
 
     // Find user by username
     const user = await User.findOne({ username });
+    console.log('User found:', user ? 'yes' : 'no');
+
     if (!user) {
+      console.log('User not found');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isMatch = await user.comparePassword(password);
+    console.log('Password match:', isMatch);
+
     if (!isMatch) {
+      console.log('Password mismatch');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -85,6 +96,8 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    console.log('Login successful for user:', user.username);
 
     res.json({
       token,
