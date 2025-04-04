@@ -16,13 +16,33 @@ const BlogDetail = () => {
 
   const fetchBlog = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+      console.log('Fetching blog with ID:', id);
+      console.log('API URL:', process.env.REACT_APP_API_URL);
+      
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/blogs/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Blog fetch response:', response.data);
       setBlog(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch blog');
+      console.error('Error fetching blog:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      
+      if (err.response) {
+        setError(err.response.data.message || 'Failed to fetch blog');
+      } else if (err.request) {
+        setError('Unable to connect to server. Please check your internet connection.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
       setLoading(false);
-      console.error('Error fetching blog:', err);
     }
   };
 
