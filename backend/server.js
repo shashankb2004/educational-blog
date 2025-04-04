@@ -10,13 +10,27 @@ dotenv.config();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'https://shashankb2004.github.io',
+  'http://localhost:3000',
+  'http://localhost:5000'
+];
+
 app.use(cors({
-  origin: '*',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 600
+  exposedHeaders: ['Content-Range', 'X-Content-Range']
 }));
 
 // Handle preflight requests
@@ -24,10 +38,14 @@ app.options('*', cors());
 
 // Set security headers
 app.use((req, res, next) => {
-  res.setHeader('Permissions-Policy', 'interest-cohort=()');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Permissions-Policy', 'interest-cohort=()');
   next();
 });
 
