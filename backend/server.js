@@ -11,11 +11,26 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: '*', // Allow all origins
+  origin: '*',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 600
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+
+// Set security headers
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'interest-cohort=()');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 app.use(express.json());
 
 // MongoDB Connection

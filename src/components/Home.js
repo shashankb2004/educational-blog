@@ -14,12 +14,21 @@ const Home = () => {
 
   const fetchFeaturedBlogs = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/blogs');
+      console.log('Fetching blogs from:', process.env.REACT_APP_API_URL);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/blogs`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       // Get the latest 3 blogs for showcase
       setFeaturedBlogs(response.data.slice(0, 3));
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching blogs:', err);
+      console.error('Error fetching blogs:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       setLoading(false);
     }
   };
