@@ -12,6 +12,7 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   'https://shashankb2004.github.io',
+  'https://educational-blog-1.onrender.com',
   'http://localhost:3000',
   'http://localhost:5000'
 ];
