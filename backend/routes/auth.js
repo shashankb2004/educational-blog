@@ -7,10 +7,13 @@ const auth = require('../middleware/auth');
 // Register/Signup route
 router.post('/signup', async (req, res) => {
   try {
+    console.log('Signup attempt with data:', { username: req.body.username, email: req.body.email });
+    
     const { username, email, password } = req.body;
 
     // Validate input
     if (!username || !email || !password) {
+      console.log('Missing required fields:', { username, email, password: !!password });
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
@@ -23,6 +26,10 @@ router.post('/signup', async (req, res) => {
     });
 
     if (existingUser) {
+      console.log('User already exists:', { 
+        email: existingUser.email === email.toLowerCase(),
+        username: existingUser.username === username.toLowerCase()
+      });
       if (existingUser.email === email.toLowerCase()) {
         return res.status(400).json({ message: 'Email already registered' });
       }
@@ -36,7 +43,9 @@ router.post('/signup', async (req, res) => {
       password
     });
 
+    console.log('Attempting to save new user...');
     await user.save();
+    console.log('User saved successfully');
 
     // Generate JWT token
     const token = jwt.sign(
@@ -45,6 +54,7 @@ router.post('/signup', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    console.log('Signup successful for user:', username);
     res.status(201).json({
       token,
       user: {

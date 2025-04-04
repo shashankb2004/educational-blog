@@ -37,36 +37,64 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    // Validation checks
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('All fields are required');
-      return;
-    }
-
-    if (formData.username.length < 3) {
-      setError('Username must be at least 3 characters long');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
     setLoading(true);
+
     try {
-      const { confirmPassword, ...signupData } = formData;
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/signup`, signupData);
-      login(response.data);
-      navigate('/');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create account');
+      // Validation checks
+      if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+        setError('All fields are required');
+        setLoading(false);
+        return;
+      }
+
+      if (formData.username.length < 3) {
+        setError('Username must be at least 3 characters long');
+        setLoading(false);
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Attempting to sign up with:', {
+        username: formData.username,
+        email: formData.email,
+        apiUrl: process.env.REACT_APP_API_URL
+      });
+
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
+
+      console.log('Signup response:', response.data);
+
+      if (response.data.token && response.data.user) {
+        login(response.data);
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Signup error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(error.response.data.message || 'Failed to create account');
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError('Unable to connect to server. Please check your internet connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
