@@ -1,3 +1,91 @@
+# EduBlog
+
+A full-stack educational blogging platform built with React, Node.js, Express, and MongoDB.
+
+## Features
+
+- User authentication (signup, login, logout)
+- Create, read, update, and delete blog posts
+- Profile management
+- Responsive design
+- Password change functionality
+- Category-based blog organization
+
+## Tech Stack
+
+### Frontend
+- React
+- React Router
+- Bootstrap
+- Axios
+- Context API for state management
+
+### Backend
+- Node.js
+- Express
+- MongoDB with Mongoose
+- JWT for authentication
+- bcrypt for password hashing
+
+## Getting Started
+
+### Prerequisites
+- Node.js
+- MongoDB
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/educational-blog.git
+cd educational-blog
+```
+
+2. Install frontend dependencies
+```bash
+npm install
+```
+
+3. Install backend dependencies
+```bash
+cd backend
+npm install
+```
+
+4. Create .env file in backend directory
+```
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+```
+
+5. Start the backend server
+```bash
+cd backend
+npm start
+```
+
+6. Start the frontend development server
+```bash
+cd ..
+npm start
+```
+
+The application will be available at http://localhost:3000
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

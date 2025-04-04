@@ -1,0 +1,91 @@
+/* Navbar container */
+.navbar {
+  position: relative;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Profile button hover effect */
+.nav-item.dropdown .btn-link:hover .rounded-circle {
+  border-color: var(--bs-primary) !important;
+  transform: scale(1.05);
+}
+
+/* Navbar animations */
+.navbar-collapse {
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-collapse:not(.show) {
+  display: block;
+  height: 0 !important;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.navbar-collapse.show {
+  height: auto !important;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Dropdown animations */
+.dropdown-menu {
+  display: none;
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Navbar item hover effect */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--bs-primary);
+}
+
+/* Dropdown items hover effect */
+.dropdown-item {
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+/* Mobile menu specific styles */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background-color: white;
+  }
+
+  .nav-link:after {
+    display: none;
+  }
+
+  .dropdown-menu {
+    background-color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.5rem;
+    border-radius: 8px;
+  }
+}
+
+/* Fix for profile alignment */
+.navbar-nav .nav-item.dropdown {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-nav .nav-item.dropdown .btn-link {
+  white-space: nowrap;
+  margin: 0;
+} 
