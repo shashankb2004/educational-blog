@@ -29,17 +29,14 @@ mongoose.connect(process.env.MONGODB_URI, {
   socketTimeoutMS: 45000,
 })
 .then(() => {
-  console.log('Successfully connected to MongoDB');
-  console.log('Database:', mongoose.connection.db.databaseName);
+  console.log('✅ MongoDB Connection Status: Connected');
+  console.log('📊 Database Name:', mongoose.connection.name);
+  console.log('🔌 Connection Host:', mongoose.connection.host);
+  console.log('🔑 Connection Port:', mongoose.connection.port);
 })
 .catch((err) => {
-  console.error('MongoDB connection error:', err);
-  console.error('Error details:', {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    codeName: err.codeName
-  });
+  console.error('❌ MongoDB Connection Error:', err.message);
+  console.error('🔍 Error Details:', err);
   process.exit(1);
 });
 
