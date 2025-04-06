@@ -143,4 +143,51 @@ router.get('/profile', auth, async (req, res) => {
   }
 });
 
+// Change password route (protected)
+router.post('/change-password', auth, async (req, res) => {
+  try {
+    console.log('Change password attempt for user:', req.user.userId);
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      console.log('Missing required fields');
+      return res.status(400).json({ message: 'Please provide both current and new password' });
+    }
+
+    // Validate new password length
+    if (newPassword.length < 6) {
+      console.log('New password too short');
+      return res.status(400).json({ message: 'New password must be at least 6 characters long' });
+    }
+
+    // Get user
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      console.log('Current password incorrect');
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+    console.log('Password updated successfully');
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ 
+      message: 'Server error while changing password',
+      error: error.message 
+    });
+  }
+});
+
 module.exports = router; 
